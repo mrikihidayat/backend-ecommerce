@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('./config/googleAuth');
 
+// Import Routes
 const userRoutes = require('./routes/userRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -19,10 +20,11 @@ const categoryRoutes = require('./routes/categoryRoutes');
 
 const app = express();
 
+// Middleware Setup
 app.use(cookieParser());
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(
     session({
@@ -40,6 +42,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Route Setup
 app.use('/api/users', userRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/auth', authRoutes);
@@ -52,7 +55,7 @@ app.use('/api/shippings', shippingRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/categories', categoryRoutes);
 
-
+// Error Handler
 app.use((err, req, res, next) => {
     res.status(500).json({ success: false, message: err.message });
 });
