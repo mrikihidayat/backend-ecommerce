@@ -68,6 +68,24 @@ exports.updateReview = async (id, data) => {
     return await review.save();
 };
 
+exports.calculateAverageRating = async (product_id) => {
+    if (!product_id) {
+        throw new Error('Product ID is required');
+    }
+
+    const reviews = await Review.find({ product_id });
+
+    if (!reviews.length) {
+        return 0;
+    }
+
+    const totalRate = reviews.reduce((sum, review) => sum + review.rate, 0);
+    const averageRate = totalRate / reviews.length;
+
+    return parseFloat(averageRate.toFixed(1));
+};
+
+
 exports.deleteReview = async (id) => {
     const review = await Review.findByIdAndDelete(id);
     if (!review) throw new Error('Review not found');
