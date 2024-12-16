@@ -5,6 +5,7 @@ const {
     getUserById,
     deleteUser,
     updateUser,
+    countUser,
 } = require('../services/userService');
 
 exports.createUser = async (req, res) => {
@@ -69,6 +70,15 @@ exports.deleteUser = async (req, res) => {
             return res.status(404).json(result(1, 'failed', { message: 'User not found' }));
         }
         res.status(200).json(result(0, 'success', { message }));
+    } catch (error) {
+        res.status(500).json(result(1, 'failed', { message: error.message }));
+    }
+};
+
+exports.countUser = async (req, res) => {
+    try {
+        const count = await countUser();
+        res.status(200).json(result(0, 'success', { count }));
     } catch (error) {
         res.status(500).json(result(1, 'failed', { message: error.message }));
     }

@@ -81,3 +81,28 @@ exports.deleteProduct = async (id) => {
     if (!product) throw new Error('Product not found');
     return 'Product deleted successfully';
 };
+
+exports.getProductsByBrand = async (brandId) => {
+    try {
+        return await Product.find({ brand_id: brandId });
+    } catch (error) {
+        throw new Error(`Failed to get products by brand. Reason: ${error.message}`);
+    }
+};
+
+exports.getProductsByCategory = async (categoryId) => {
+    try {
+        return await Product.find({ category_id: categoryId });
+    } catch (error) {
+        throw new Error(`Failed to get products by category. Reason: ${error.message}`);
+    }
+};
+
+exports.countProduct = async () => {
+    try {
+        const count = await Product.countDocuments();
+        return count;
+    } catch (error) {
+        throw new Error(`Failed to count product. Reason: ${error.message}`);
+    }
+};
