@@ -148,12 +148,3 @@ exports.removeToken = async (identifier) => {
 
     return user;
 };
-
-exports.countUser = async () => {
-    try {
-        const count = await User.countDocuments();
-        return count;
-    } catch (error) {
-        throw new Error(`Failed to count user. Reason: ${error.message}`);
-    }
-}

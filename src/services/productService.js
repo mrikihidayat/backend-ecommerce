@@ -41,6 +41,18 @@ exports.getProductById = async (id) => {
     return product;
 };
 
+exports.getProductsByBrandId = async (brandId) => {
+    const products = await Product.find({ brand_id: brandId }).populate('brand_id').populate('category_id');
+    if (!products || products.length === 0) throw new Error('No products found for this brand');
+    return products;
+};
+
+exports.getProductsByCategoryId = async (categoryId) => {
+    const products = await Product.find({ category_id: categoryId }).populate('brand_id').populate('category_id');
+    if (!products || products.length === 0) throw new Error('No products found for this category');
+    return products;
+};
+
 exports.updateProduct = async (id, data) => {
     const allowedAttributes = ['name', 'jenis', 'variant', 'category', 'price', 'stock', 'description', 'brand_id', 'category_id', 'image'];
     const extra1Updates = {};
@@ -80,29 +92,4 @@ exports.deleteProduct = async (id) => {
     const product = await Product.findByIdAndDelete(id);
     if (!product) throw new Error('Product not found');
     return 'Product deleted successfully';
-};
-
-exports.getProductsByBrand = async (brandId) => {
-    try {
-        return await Product.find({ brand_id: brandId });
-    } catch (error) {
-        throw new Error(`Failed to get products by brand. Reason: ${error.message}`);
-    }
-};
-
-exports.getProductsByCategory = async (categoryId) => {
-    try {
-        return await Product.find({ category_id: categoryId });
-    } catch (error) {
-        throw new Error(`Failed to get products by category. Reason: ${error.message}`);
-    }
-};
-
-exports.countProduct = async () => {
-    try {
-        const count = await Product.countDocuments();
-        return count;
-    } catch (error) {
-        throw new Error(`Failed to count product. Reason: ${error.message}`);
-    }
 };

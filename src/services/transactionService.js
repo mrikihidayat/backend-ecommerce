@@ -275,12 +275,3 @@ exports.getTransactionStatus = async (orderId) => {
 exports.getSupportedBanks = () => {
     return midtransService.getSupportedBanks();
 };
-
-exports.countTransactions = async () => {
-    try {
-        const count = await Transaction.countDocuments();
-        return count;
-    } catch (error) {
-        throw new Error(`Failed to count transactions. Reason: ${error.message}`);
-    }
-};

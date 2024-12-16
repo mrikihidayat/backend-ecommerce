@@ -28,6 +28,24 @@ exports.getProductById = async (req, res) => {
     }
 };
 
+exports.getProductsByBrandId = async (req, res) => {
+    try {
+        const products = await productService.getProductsByBrandId(req.params.brandId);
+        res.status(200).json(result(0, 'success', products));
+    } catch (error) {
+        res.status(404).json(result(1, 'failed', { message: error.message }));
+    }
+};
+
+exports.getProductsByCategoryId = async (req, res) => {
+    try {
+        const products = await productService.getProductsByCategoryId(req.params.categoryId);
+        res.status(200).json(result(0, 'success', products));
+    } catch (error) {
+        res.status(404).json(result(1, 'failed', { message: error.message }));
+    }
+};
+
 exports.updateProduct = async (req, res) => {
     try {
         const product = await productService.updateProduct(req.params.id, req.body);
@@ -43,34 +61,5 @@ exports.deleteProduct = async (req, res) => {
         res.status(200).json(result(0, 'success', { message }));
     } catch (error) {
         res.status(404).json(result(1, 'failed', { message: error.message }));
-    }
-};
-
-exports.getProductsByBrand = async (req, res) => {
-    try {
-        const { brandId } = req.params;
-        const products = await productService.getProductsByBrand(brandId);
-        res.status(200).json(result(0, 'success', products));
-    } catch (error) {
-        res.status(500).json(result(1, 'failed', { message: error.message }));
-    }
-};
-
-exports.getProductsByCategory = async (req, res) => {
-    try {
-        const { categoryId } = req.params;
-        const products = await productService.getProductsByCategory(categoryId);
-        res.status(200).json(result(0, 'success', products));
-    } catch (error) {
-        res.status(500).json(result(1, 'failed', { message: error.message }));
-    }
-};
-
-exports.getProductCount = async (req, res) => {
-    try {
-        const count = await productService.countProduct();
-        res.status(200).json(result(0, 'success', { count }));
-    } catch (error) {
-        res.status(500).json(result(1, 'failed', { message: error.message }));
     }
 };

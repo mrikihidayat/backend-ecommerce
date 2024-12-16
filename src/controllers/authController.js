@@ -96,9 +96,10 @@ exports.googleAuthCallback = async (req, res) => {
         }
 
         const token = generateToken({ id: user._id });
+        const username = user.username;
 
         res.clearCookie('redirectUrl');
-        return res.redirect(`${redirectUrl}?token=${token}`);
+        return res.redirect(`${redirectUrl}?token=${token}&username=${username}`);
     } catch (error) {
         res.status(400).json(result(1, 'failed', { message: error.message }));
     }
