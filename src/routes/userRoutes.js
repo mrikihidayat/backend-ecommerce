@@ -6,6 +6,7 @@ const {
     getUserByUsername,
     deleteUser,
     updateUser,
+    countUser,
 } = require('../controllers/userController');
 const authenticate = require('../middlewares/authMiddleware');
 

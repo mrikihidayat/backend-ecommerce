@@ -6,6 +6,7 @@ const {
     deleteUser,
     updateUser,
     getUserByEmailOrUsername,
+    countUser,
 } = require('../services/userService');
 
 exports.createUser = async (req, res) => {
