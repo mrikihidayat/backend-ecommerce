@@ -71,9 +71,8 @@ exports.getShippingById = async (id) => {
     return shipping;
 };
 
-// Get Shipping by User ID
 exports.getShippingByUserId = async (userId) => {
-    const shippings = await Shipping.find({ user_id: userId });
+    const shippings = await Shipping.find({ user_id: mongoose.Types.ObjectId(userId) });
     if (shippings.length === 0) throw new Error('No shippings found for this user');
     return shippings;
 };
