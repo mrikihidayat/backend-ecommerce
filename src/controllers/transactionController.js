@@ -69,3 +69,23 @@ exports.getSupportedBanks = async (req, res) => {
         res.status(500).json(result(1, 'failed', { message: error.message }));
     }
 };
+
+exports.countTransactions = async (req, res) => {
+    try {
+        const count = await transactionService.countTransactions();
+        res.status(200).json(result(0, 'success', { count }));
+    } catch (error) {
+        res.status(500).json(result(1, 'failed', { message: error.message }));
+    }
+};
+
+exports.downloadTransactionReport = async (req, res) => {
+    try {
+        const csv = await transactionService.downloadTransactionReport();
+        res.setHeader('Content-Disposition', 'attachment; filename=transactions_report.csv');
+        res.setHeader('Content-Type', 'text/csv');
+        res.send(csv);
+    } catch (error) {
+        res.status(500).json({ status: 1, message: error.message });
+    }
+};

@@ -11,5 +11,7 @@ router.put('/update/:id', authenticate, transactionController.updateTransaction)
 router.delete('/delete/:id', authenticate, transactionController.deleteTransaction);
 router.get('/status/:orderId', authenticate, transactionController.getTransactionStatus);
 router.get('/supported-banks', authenticate, transactionController.getSupportedBanks);
+router.get('/count', authenticate, transactionController.countTransactions);
+router.get('/rekap/report', authenticate, transactionController.downloadTransactionReport);
 
 module.exports = router;

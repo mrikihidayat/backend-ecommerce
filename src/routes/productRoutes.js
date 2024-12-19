@@ -11,5 +11,6 @@ router.get('/brand/:brandId', productController.getProductsByBrandId);
 router.get('/category/:categoryId', productController.getProductsByCategoryId);
 router.put('/:id', authenticate, productController.updateProduct);
 router.delete('/:id', authenticate, productController.deleteProduct);
+router.get('/amount/count',  authenticate, productController.getProductCount);
 
 module.exports = router;

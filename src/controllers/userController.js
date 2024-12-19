@@ -87,3 +87,12 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json(result(1, 'failed', { message: error.message }));
     }
 };
+
+exports.countUser = async (req, res) => {
+    try {
+        const count = await countUser();
+        res.status(200).json(result(0, 'success', { count }));
+    } catch (error) {
+        res.status(500).json(result(1, 'failed', { message: error.message }));
+    }
+};

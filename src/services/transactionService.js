@@ -303,3 +303,65 @@ exports.getTransactionStatus = async (orderId) => {
 exports.getSupportedBanks = () => {
     return midtransService.getSupportedBanks();
 };
+
+exports.countTransactions = async () => {
+    try {
+        const count = await Transaction.countDocuments();
+        return count;
+    } catch (error) {
+        throw new Error(`Failed to count transactions. Reason: ${error.message}`);
+    }
+};
+
+exports.downloadTransactionReport = async () => {
+    const transactions = await Transaction.find()
+        .populate('user_id', 'name email phone user_id')
+        .populate('product_id.product_id', 'name price category');
+
+    // Transform the data into a format suitable for CSV
+    const csvData = transactions.map(transaction => {
+        return transaction.product_id.map(product => {
+            // Check if user and product are not null
+            const userName = transaction.user_id ? transaction.user_id.name : 'Unknown User';
+            const userEmail = transaction.user_id ? transaction.user_id.email : 'Unknown Email';
+            const productName = product.product_id ? product.product_id.name : 'Unknown Product';
+
+            return {
+                order_id: transaction.order_id,
+                user_name: userName,
+                user_email: userEmail,
+                product_name: productName,
+                quantity: product.quantity,
+                amount: transaction.amount,
+                status: transaction.status,
+                payment_type: transaction.payment_type,
+                bank: transaction.bank,
+                createdAt: transaction.createdAt.toISOString(), // Format date to ISO string
+            };
+        });
+    }).flat(); // Flatten the array
+
+    // Convert JSON to CSV
+    const json2csvParser = new Parser({
+        fields: [
+            { label: 'Order ID', value: 'order_id' },
+            { label: 'User  Name', value: 'user_name' },
+            { label: 'User  Email', value: 'user_email' },
+            { label: 'Product Name', value: 'product_name' },
+            { label: 'Quantity', value: 'quantity' },
+            { label: 'Amount', value: 'amount' },
+            { label: 'Status', value: 'status' },
+            { label: 'Payment Type', value: 'payment_type' },
+            { label: 'Bank', value: 'bank' },
+            { label: 'Created At', value: 'createdAt' },
+        ],
+        excelStrings: true,
+        withBOM: true,
+        delimiter: ',', // Use comma as delimiter
+        eol: '\r\n' // Use Windows-style line endings
+    });
+
+    const csv = json2csvParser.parse(csvData);
+    
+    return csv;
+};

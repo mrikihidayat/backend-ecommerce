@@ -115,3 +115,12 @@ exports.deleteProduct = async (id) => {
     if (!product) throw new Error('Product not found');
     return 'Product deleted successfully';
 };
+
+exports.countProduct = async () => {
+    try {
+        const count = await Product.countDocuments();
+        return count;
+    } catch (error) {
+        throw new Error(`Failed to count product. Reason: ${error.message}`);
+    }
+};
