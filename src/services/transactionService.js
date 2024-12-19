@@ -130,14 +130,16 @@ exports.getAllTransactions = async () => {
         .populate('product_id.product_id', 'name price category')
         .lean();
 
-    const orderIds = transactions.map(t => t.order_id);
+    const orderIds = transactions.map(t => mongoose.Types.ObjectId(t._id));
     const shippings = await Shipping.find({ order_id: { $in: orderIds } }).lean();
+
     const shippingMap = {};
     shippings.forEach(s => {
-        shippingMap[s.order_id] = s;
+        shippingMap[s.order_id.toString()] = s;
     });
+
     const transactionsWithShipping = transactions.map(t => {
-        const shippingData = shippingMap[t.order_id] || null;
+        const shippingData = shippingMap[t._id.toString()] || null;
         return {
             ...t,
             shipping: shippingData
@@ -159,13 +161,14 @@ exports.getTransactionById = async (id) => {
         );
     }
 
-    const shipping = await Shipping.findOne({ order_id: transaction.order_id }).lean();
+    const shipping = await Shipping.findOne({ order_id: mongoose.Types.ObjectId(transaction._id) }).lean();
 
     return {
         ...transaction,
         shipping: shipping || null
     };
 };
+
 
 exports.updateTransaction = async (id, data) => {
     const allowedAttributes = [

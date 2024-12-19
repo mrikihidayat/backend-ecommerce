@@ -1,4 +1,5 @@
 const Shipping = require('../models/shippingModel');
+const mongoose = require('mongoose');
 
 exports.createShipping = async (data) => {
     const allowedAttributes = ['order_id', 'user_id', 'status'];
@@ -11,25 +12,24 @@ exports.createShipping = async (data) => {
         }
     }
 
-    const shipping = new Shipping({ ...data, extra1 });
-    return await shipping.save();
-};
+    if (typeof data.order_id === 'string') {
+        data.order_id = mongoose.Types.ObjectId(data.order_id);
+    }
 
-exports.getAllShippings = async () => {
-    return await Shipping.find();
-};
+    if (typeof data.user_id === 'string') {
+        data.user_id = mongoose.Types.ObjectId(data.user_id);
+    }
 
-exports.getShippingById = async (id) => {
-    const shipping = await Shipping.findById(id);
-    if (!shipping) throw new Error('Shipping not found');
-    return shipping;
-};
+    const existingShipping = await Shipping.findOne({ order_id: data.order_id });
 
-// Get Shipping by User ID
-exports.getShippingByUserId = async (userId) => {
-    const shippings = await Shipping.find({ user_id: userId });
-    if (shippings.length === 0) throw new Error('No shippings found for this user');
-    return shippings;
+    if (existingShipping) {
+        Object.assign(existingShipping.extra1, extra1);
+        Object.assign(existingShipping, data);
+        return await existingShipping.save();
+    } else {
+        const shipping = new Shipping({ ...data, extra1 });
+        return await shipping.save();
+    }
 };
 
 exports.updateShipping = async (id, data) => {
@@ -48,9 +48,34 @@ exports.updateShipping = async (id, data) => {
     const shipping = await Shipping.findById(id);
     if (!shipping) throw new Error('Shipping not found');
 
+    if (updates.order_id && typeof updates.order_id === 'string') {
+        updates.order_id = mongoose.Types.ObjectId(updates.order_id);
+    }
+
+    if (updates.user_id && typeof updates.user_id === 'string') {
+        updates.user_id = mongoose.Types.ObjectId(updates.user_id);
+    }
+
     Object.assign(shipping.extra1, extra1Updates);
     Object.assign(shipping, updates);
     return await shipping.save();
+};
+
+exports.getAllShippings = async () => {
+    return await Shipping.find();
+};
+
+exports.getShippingById = async (id) => {
+    const shipping = await Shipping.findById(id);
+    if (!shipping) throw new Error('Shipping not found');
+    return shipping;
+};
+
+// Get Shipping by User ID
+exports.getShippingByUserId = async (userId) => {
+    const shippings = await Shipping.find({ user_id: userId });
+    if (shippings.length === 0) throw new Error('No shippings found for this user');
+    return shippings;
 };
 
 exports.deleteShipping = async (id) => {
