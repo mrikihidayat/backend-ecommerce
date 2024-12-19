@@ -130,7 +130,7 @@ exports.getAllTransactions = async () => {
         .populate('product_id.product_id', 'name price category')
         .lean();
 
-    const orderIds = transactions.map(t => mongoose.Types.ObjectId(t._id));
+    const orderIds = transactions.map(t => new mongoose.Types.ObjectId(t._id));
     const shippings = await Shipping.find({ order_id: { $in: orderIds } }).lean();
 
     const shippingMap = {};
@@ -161,7 +161,7 @@ exports.getTransactionById = async (id) => {
         );
     }
 
-    const shipping = await Shipping.findOne({ order_id: mongoose.Types.ObjectId(transaction._id) }).lean();
+    const shipping = await Shipping.findOne({ order_id: new mongoose.Types.ObjectId(transaction._id) }).lean();
 
     return {
         ...transaction,
