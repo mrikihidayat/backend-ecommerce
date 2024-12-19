@@ -12,12 +12,12 @@ exports.createShipping = async (data) => {
         }
     }
 
-    if (typeof data.order_id === 'string') {
-        data.order_id = mongoose.Types.ObjectId(data.order_id);
+    if (typeof data.order_id === 'string' && mongoose.isValidObjectId(data.order_id)) {
+        data.order_id = new mongoose.Types.ObjectId(data.order_id);
     }
 
-    if (typeof data.user_id === 'string') {
-        data.user_id = mongoose.Types.ObjectId(data.user_id);
+    if (typeof data.user_id === 'string' && mongoose.isValidObjectId(data.user_id)) {
+        data.user_id = new mongoose.Types.ObjectId(data.user_id);
     }
 
     const existingShipping = await Shipping.findOne({ order_id: data.order_id });
@@ -49,17 +49,24 @@ exports.updateShipping = async (id, data) => {
     if (!shipping) throw new Error('Shipping not found');
 
     if (updates.order_id && typeof updates.order_id === 'string') {
-        updates.order_id = mongoose.Types.ObjectId(updates.order_id);
+        if (!mongoose.isValidObjectId(updates.order_id)) {
+            throw new Error('Invalid order_id format');
+        }
+        updates.order_id = new mongoose.Types.ObjectId(updates.order_id);
     }
 
     if (updates.user_id && typeof updates.user_id === 'string') {
-        updates.user_id = mongoose.Types.ObjectId(updates.user_id);
+        if (!mongoose.isValidObjectId(updates.user_id)) {
+            throw new Error('Invalid user_id format');
+        }
+        updates.user_id = new mongoose.Types.ObjectId(updates.user_id);
     }
 
     Object.assign(shipping.extra1, extra1Updates);
     Object.assign(shipping, updates);
     return await shipping.save();
 };
+
 
 exports.getAllShippings = async () => {
     return await Shipping.find();
