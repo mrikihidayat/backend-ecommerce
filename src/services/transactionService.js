@@ -1,6 +1,7 @@
 const Transaction = require('../models/transactionModel');
 const User = require('../models/userModel');
 const Product = require('../models/productModel');
+const Shipping = require('../models/shippingModel');
 const mongoose = require('mongoose');
 const midtransService = require('./midtransService');
 
@@ -124,22 +125,46 @@ exports.createTransaction = async (data) => {
 };
 
 exports.getAllTransactions = async () => {
-    return await Transaction.find()
+    const transactions = await Transaction.find()
         .populate('user_id', 'name email phone user_id')
-        .populate('product_id.product_id', 'name price category');
+        .populate('product_id.product_id', 'name price category')
+        .lean();
+
+    const orderIds = transactions.map(t => t.order_id);
+    const shippings = await Shipping.find({ order_id: { $in: orderIds } }).lean();
+    const shippingMap = {};
+    shippings.forEach(s => {
+        shippingMap[s.order_id] = s;
+    });
+    const transactionsWithShipping = transactions.map(t => {
+        const shippingData = shippingMap[t.order_id] || null;
+        return {
+            ...t,
+            shipping: shippingData
+        };
+    });
+
+    return transactionsWithShipping;
 };
 
 exports.getTransactionById = async (id) => {
     const transaction = await Transaction.findById(id)
         .populate('user_id', 'name email phone user_id')
-        .populate('product_id.product_id', 'name price category');
+        .populate('product_id.product_id', 'name price category')
+        .lean();
 
     if (!transaction) {
         throw new Error(
             `Transaction with ID '${id}' not found. Ensure the provided transaction ID is correct.`
         );
     }
-    return transaction;
+
+    const shipping = await Shipping.findOne({ order_id: transaction.order_id }).lean();
+
+    return {
+        ...transaction,
+        shipping: shipping || null
+    };
 };
 
 exports.updateTransaction = async (id, data) => {

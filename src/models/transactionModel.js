@@ -10,7 +10,7 @@ const transactionSchema = new mongoose.Schema({
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     product_id: { type: [productSchema], required: true },
     amount: { type: Number, required: true },
-    status: { type: String, enum: ['pending', 'success', 'failed'], default: 'pending' },
+    status: { type: String, default: 'pending' },
     payment_type: { type: String, required: true },
     bank: { type: String, required: true },
     description: { type: String, required: false },
